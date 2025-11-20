@@ -16,9 +16,31 @@ public class GestionDeEntradas {
     }
 
     public static void cuentaInvitado(){
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Elige una de las opciones: \n1. Comprar entradas. \n2. Devolución de entradas. \n3. Ir atrás.");
+        int el2 = sc.nextInt();
+        if(el2 == 1){
+            comprarEntradas();
+        }
+        else if(el2 == 2){
+            devolucionEntradas();
+        }
+        else if(el2 == 3){
+            menuPrincipal(sc);
+        }
+        else{
+            System.out.println("Solo se acepta 1 o 2 o 3");
+            cuentaInvitado();
+        }
+    }
+    public static void comprarEntradas(){
 
     }
-    public static void cuntaAdmin(){
+    public static void devolucionEntradas(){
+
+    }
+    
+    public static void cuentaAdmin(){
 
     }
     public static void main(String[] args){
@@ -26,3 +48,4 @@ public class GestionDeEntradas {
         menuPrincipal(sc);
     }
 }
+
