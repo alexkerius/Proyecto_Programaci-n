@@ -9,7 +9,7 @@ public class GestionDeEntradas {
         {"09:30", "12:00", "15:00", "19:00", "21:00"},
         {"11:00", "13:30", "15:30", "17:00", "19:00"}
     };
-    static int[][] compras = new int[400][8];
+    static int[][] compras = new int[400][7];
     
     public static void menuPrincipal(Scanner sc){
         System.out.println("Bienvenido al gestion de venta de entradas al cine! Elige una de las opciones: \n 1. Invitado. \n 2. Cuenta admin.");
@@ -52,39 +52,50 @@ public class GestionDeEntradas {
             System.out.println("Solo se acepta 1,2,3,4,5");
             comprarEntradas();
         }
-        for(int i = 0; i < compras.length; i++){
-            if(compras[i][3] == 0){
-                compras[i][3] = el3;
+        System.out.println("Elige asientos:\nNota: Para eligir asiento, tienes que entrar dos numeros: primero corresponde a fila y el segundo a asiento. Si ya has elegido el numero de asientos suficientes, inserta 0 para seguir al siguente paso.");
+        while(true){
+            printSeats(asientosPorPeli[el3-1]);
+            compras[indexDePrimerNoCero(3)][3] = el3;
+            int asiento = sc.nextInt();
+            if(asiento == 0){
                 break;
             }
-        }
-        System.out.println("Elige asientos:\nNota: Para eligir asiento, tienes que entrar dos numeros: primero corresponde a fila y el segundo a asiento.");
-        printSeats();  
+            compras[indexDePrimerNoCero(4)][4] = asiento;
+            asientosPorPeli[el3-1][(asiento/10)-1][(asiento%10)-1] = 1;
+        } 
     }
 
-    public static void printSeats() {
-        int rows = 10;
-        int cols = 8;
-
-        int[][] hall = new int[rows][cols];
-
+    public static void printSeats(int[][] hall) {
+        int rows = hall.length;
+        int cols = hall[0].length;
         System.out.print("    ");
         for (int j = 1; j <= cols; j++) {
             System.out.print(j + " ");
         }
         System.out.println();
         for (int i = 0; i < rows; i++) {
-            System.out.print((i + 1) + " | "); 
+            System.out.print((i + 1) + " | ");
             for (int j = 0; j < cols; j++) {
                 System.out.print(hall[i][j] + " ");
             }
             System.out.println();
         }
     }
+
+    public static int indexDePrimerNoCero(int k){
+        for(int i = 0; i < compras.length; i++){
+            if(compras[i][k] == 0){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
     public static void devolucionEntradas(){
 
     }
-    
+
     public static void cuentaAdmin(){
 
     }
@@ -93,6 +104,3 @@ public class GestionDeEntradas {
         menuPrincipal(sc);
     }
 }
-
-
-
