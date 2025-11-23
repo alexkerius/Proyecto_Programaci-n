@@ -1,15 +1,16 @@
 import java.util.Scanner;
 public class GestionDeEntradas {
-    
-    static int[][] asientos = new int[10][8];
     static double precio = 5;
-    //no funciona pq los elementos de peli1...5 son de diferentes tipos(lo corrigo) - Alex 
-    static int[][] peli1 = {{asientos.clone()}, {"10:00", "12:00","13:00","16:00","20:00"},precio};
-    static int[][] peli2 = {{asientos.clone()}, {"9:00", "11:00","12:00","14:00","17:00"},precio};
-    static int[][] peli3 = {{asientos.clone()}, {"10:00", "12:30","14:30","16:00","18:00"},precio};
-    static int[][] peli4 = {{asientos.clone()}, {"09:30", "12:00","15:00","19:00","21:00"},precio};
-    static int[][] peli5 = {{asientos.clone()}, {"11:00", "13:30","15:30","17:00","19:00"},precio};
+    static int[][][] asientosPorPeli = new int[5][10][8];
+    static String[][] horariosPorPeli = {
+        {"10:00", "12:00", "13:00", "16:00", "20:00"},
+        {"9:00",  "11:00", "12:00", "14:00", "17:00"},
+        {"10:00", "12:30", "14:30", "16:00", "18:00"},
+        {"09:30", "12:00", "15:00", "19:00", "21:00"},
+        {"11:00", "13:30", "15:30", "17:00", "19:00"}
+    };
     static int[][] compras = new int[400][8];
+    
     public static void menuPrincipal(Scanner sc){
         System.out.println("Bienvenido al gestion de venta de entradas al cine! Elige una de las opciones: \n 1. Invitado. \n 2. Cuenta admin.");
         int el1 = sc.nextInt();
@@ -52,12 +53,33 @@ public class GestionDeEntradas {
             comprarEntradas();
         }
         for(int i = 0; i < compras.length; i++){
-            if(compras[i][4] == 0){
-                compras[i][4] = el3;
+            if(compras[i][3] == 0){
+                compras[i][3] = el3;
                 break;
             }
         }
-        
+        System.out.println("Elige asientos:\nNota: Para eligir asiento, tienes que entrar dos numeros: primero corresponde a fila y el segundo a asiento.");
+        printSeats();  
+    }
+
+    public static void printSeats() {
+        int rows = 10;
+        int cols = 8;
+
+        int[][] hall = new int[rows][cols];
+
+        System.out.print("    ");
+        for (int j = 1; j <= cols; j++) {
+            System.out.print(j + " ");
+        }
+        System.out.println();
+        for (int i = 0; i < rows; i++) {
+            System.out.print((i + 1) + " | "); 
+            for (int j = 0; j < cols; j++) {
+                System.out.print(hall[i][j] + " ");
+            }
+            System.out.println();
+        }
     }
     public static void devolucionEntradas(){
 
@@ -71,5 +93,6 @@ public class GestionDeEntradas {
         menuPrincipal(sc);
     }
 }
+
 
 
