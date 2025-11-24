@@ -96,11 +96,87 @@ public class GestionDeEntradas {
 
     }
 
-    public static void cuentaAdmin(){
-
+  public static void cuentaAdmin(){
+    Scanner sc = new Scanner(System.in);
+    System.out.println("Inserte la contraseña");
+    String cont = sc.nextLine();
+    if (cont.equals("234"))
+      adminStats();
+    else{
+      System.out.println("Contraseña incorrecta \n");
+      cuentaAdmin();
     }
+  }
+  
+  public static void adminStats(){
+    System.out.println("\nBienvenido a las estadísticas de admin. Eliga una de las opciones: \n 1. Entradas vendidas. \n 2. Ingresos diarios. \n 3. Volver");
+    Scanner sc = new Scanner(System.in);
+    int stats = sc.nextInt();
+    switch (stats){
+      case 1:
+        entradasVendidas();
+        break;
+      case 2:
+        System.out.println("Ingresos diarios");
+        break;
+      case 3:
+        System.out.println("Volver al menú principal");
+        break;
+      default:
+        System.out.println("Solo se acepta 1, 2 o 3");
+    }
+  }
+  
+  public static void entradasVendidas(){
+    System.out.println("\nSeleccione el día de las entradas vendidas: \n 1. Hoy \n 2. Ayer \n 3. Volver");
+    Scanner sc = new Scanner(System.in);
+    int día = sc.nextInt();
+    int entradasHoy = (int)(Math.random() * 101); //Hay que sumar las entradas del usuario.
+    int entradasAyer = (int)(Math.random() * 101);
+    switch (día){
+      case 1:
+        ventasHoy(entradasHoy, entradasAyer); 
+        break;
+      case 2:
+        ventasAyer(entradasHoy, entradasAyer); 
+        break;
+      case 3:
+        adminStats();
+      default:
+        System.out.println("Solo se acepta 1, 2 o 3");
+    }
+  }
+  
+  public static void ventasHoy(int vh, int va){
+    System.out.println("\nEntradas vendidas hoy: "+vh);
+    System.out.println("Aumento respecto ayer: "+(vh*100/va));
+    System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
+    Scanner sc = new Scanner(System.in);
+    int op = sc.nextInt();
+    if (op==1)
+      entradasVendidas();
+    else if (op==2)
+        System.out.println("Volver al menú principal");
+    else
+      System.out.println("Solo se acepta 1 o 2");
+  }
+
+  public static void ventasAyer(int vh, int va){
+    System.out.println("\nEntradas vendidas ayer: "+vh);
+    System.out.println("Aumento de hoy: "+(vh*100/va));
+    System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
+    Scanner sc = new Scanner(System.in);
+    int op = sc.nextInt();
+    if (op==1)
+      entradasVendidas();
+    else if (op==2)
+        menuPrincipal(sc);
+    else
+      System.out.println("Solo se acepta 1 o 2");
+  }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         menuPrincipal(sc);
     }
 }
+
