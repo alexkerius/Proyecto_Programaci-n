@@ -9,7 +9,7 @@ public class GestionDeEntradas {
         {"09:30", "12:00", "15:00", "19:00", "21:00"},
         {"11:00", "13:30", "15:30", "17:00", "19:00"}
     };
-    static int[][] compras = new int[400][7];
+    static int[][] compras = new int[400][8];
     
     public static void menuPrincipal(Scanner sc){
         System.out.println("Bienvenido al gestion de venta de entradas al cine! Elige una de las opciones: \n 1. Invitado. \n 2. Cuenta admin.");
@@ -28,7 +28,7 @@ public class GestionDeEntradas {
 
     public static void cuentaInvitado(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("Elige una de las opciones: \n1. Comprar entradas. \n2. Devolución de entradas. \n3. Ir atrás.");
+        System.out.println("Elige una de las opciones: \n1. Comprar entradas. \n2. Devolución de entradas. \n3. Volver.");
         int el2 = sc.nextInt();
         if(el2 == 1){
             comprarEntradas();
@@ -46,7 +46,7 @@ public class GestionDeEntradas {
     }
     public static void comprarEntradas(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("Que película quieres ver?\n1.Pelicula 1\n2.Pelicula 2\n3.Pelicula 3\n4.Pelicula 4\n5.Pelicula 5");
+        System.out.println("¿Qué película quieres ver?\n1.Pelicula 1\n2.Pelicula 2\n3.Pelicula 3\n4.Pelicula 4\n5.Pelicula 5");
         int el3 = sc.nextInt();
         if(el3 != 1 && el3 != 2 && el3 != 3 && el3 != 3 && el3 != 4 && el3 != 5){
             System.out.println("Solo se acepta 1,2,3,4,5");
@@ -92,9 +92,35 @@ public class GestionDeEntradas {
     }
 
 
-    public static void devolucionEntradas(){
-
+    public static void devolucionEntradas(int[][] datos){
+      System.out.println("\nInserte los datos de su compra: nombre, apellidos y email con el que se realizó la compra.");
+      Scanner sc=new Scanner(System.in);
+      System.out.println("Inserte su nombre:");
+      String nombre = sc.nextLine();
+      System.out.println("Inserte sus apellidos:");
+      String apellidos = sc.nextLine();
+      System.out.println("Inserte su email:");
+      String email = sc.nextLine();
+      boolean flag = true;
+      int cnt = 0;
+      while(flag && cnt < datos.length){
+        if(nombre.equals(datos[cnt][0]) && apellidos.equals(datos[cnt][1]) && email.equals(datos[cnt][2])){
+             confirmarDevolucion(datos, cnt);
+             flag = false;
+        }
+        cnt++;
+      }
+      if (flag == true){
+        System.out.println("Datos incorrectos");
+        devolucionEntradas(datos);
+      }
     }
+
+    public static void confirmarDevolucion(int[][] datos, int i){
+      System.out.println("\nDesea efectuar la devolución de su entrada a " + datos[i][4] + "a las " + datos[i][8]);
+    }
+
+
     
     public static void cuentaAdmin(){
         Scanner sc = new Scanner(System.in);
@@ -117,10 +143,10 @@ public class GestionDeEntradas {
             entradasVendidas();
             break;
           case 2:
-            System.out.println("Ingresos diarios");
+            ingresosDiarios();
             break;
           case 3:
-            System.out.println("Volver al menú principal");
+            menuPricnipal(sc);
             break;
           default:
             System.out.println("Solo se acepta 1, 2 o 3");
@@ -131,8 +157,8 @@ public class GestionDeEntradas {
         System.out.println("\nSeleccione el día de las entradas vendidas: \n 1. Hoy \n 2. Ayer \n 3. Volver");
         Scanner sc = new Scanner(System.in);
         int día = sc.nextInt();
-        int entradasHoy = (int)(Math.random() * 101); //Hay que sumar las entradas del usuario.
-        int entradasAyer = (int)(Math.random() * 101);
+        int entradasHoy = (int)(Math.random() * 101);             //Sustituir por variables no random.
+        int entradasAyer = (int)(Math.random() * 101);            //Sustituir por variables no random.
         switch (día){
           case 1:
             ventasHoy(entradasHoy, entradasAyer); 
@@ -156,7 +182,7 @@ public class GestionDeEntradas {
         if (op==1)
           entradasVendidas();
         else if (op==2)
-            System.out.println("Volver al menú principal");
+          menuPrincipal(sc);
         else
           System.out.println("Solo se acepta 1 o 2");
       }
@@ -174,10 +200,61 @@ public class GestionDeEntradas {
         else
           System.out.println("Solo se acepta 1 o 2");
       }
+    public static void ingresosDiarios(){
+        System.out.println("\nSeleccione el día de las entradas vendidas: \n 1. Hoy \n 2. Ayer \n 3. Volver");
+        Scanner sc = new Scanner(System.in);
+        int día = sc.nextInt();
+        int dineroHoy = (int)(Math.random() * 101);             //Sustituir por variables no random.
+        int dineroAyer = (int)(Math.random() * 101);            //Sustituir por variables no random.
+        switch (día){
+          case 1:
+            ingresosHoy(dineroHoy, dineroAyer); 
+            break;
+          case 2:
+            ingresosAyer(dineroHoy, dineroAyer); 
+            break;
+          case 3:
+            adminStats();
+          default:
+            System.out.println("Solo se acepta 1, 2 o 3");}
+        }
+    
+  public static void ingresosHoy(int ih, int ia){
+    System.out.println("\nIngresos de hoy: "+ih);
+    System.out.println("Aumento respecto ayer: "+(ih*100/ia)+"%");
+    System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
+    Scanner sc = new Scanner(System.in);
+    int op = sc.nextInt();
+    if (op==1)
+      entradasVendidas();
+    else if (op==2)
+      menuPrincipal(sc);
+    else
+      System.out.println("Solo se acepta 1 o 2");
+  }
+
+  public static void ingresosAyer(int ih, int ia){
+    System.out.println("\nIngresos de ayer: "+ih);
+    System.out.println("Aumento de hoy: "+(ih*100/ia)+"%");
+    System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
+    Scanner sc = new Scanner(System.in);
+    int op = sc.nextInt();
+    if (op==1)
+      entradasVendidas();
+    else if (op==2)
+        menuPrincipal(sc);
+    else
+      System.out.println("Solo se acepta 1 o 2");
+  }
+
+
+
+    
     public static void main(String[] args){
             Scanner sc = new Scanner(System.in);
             menuPrincipal(sc);
         }
 }
+
 
 
