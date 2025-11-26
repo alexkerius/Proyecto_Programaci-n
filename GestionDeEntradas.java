@@ -1,3 +1,4 @@
+// Jose, solo nos falta cambiar un poco funciones de estadistica de admin y devolucion de entradas y ya estaria
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -445,3 +446,4 @@ public class GestionDeEntradas {
 
     }
 }
+
