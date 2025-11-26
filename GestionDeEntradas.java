@@ -1,4 +1,11 @@
 import java.util.Scanner;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileWriter;
+
 public class GestionDeEntradas {
     static double precioPorEntrada = 5;
     static int[][][][] asientosPorPeli = new int[5][5][10][8];
@@ -149,6 +156,7 @@ public class GestionDeEntradas {
         }
         System.out.println(numeroDeAsientos);
         System.out.println(precioFinal);
+        guardarDatos();
     }
 
     public static void printSeats(int[][] hall) {
@@ -177,7 +185,6 @@ public class GestionDeEntradas {
         return -1;
     }
 
-
     public static void devolucionEntradas(){
       System.out.println("\nInserte los datos de su compra: nombre, apellidos y email con el que se realizó la compra.");
       Scanner sc = new Scanner(System.in);
@@ -205,6 +212,7 @@ public class GestionDeEntradas {
 
     public static void confirmarDevolucion(int i){
       System.out.println("\nDesea efectuar la devolución de su entrada a " + peliculas[i] + "a las " + horario[i]);
+      guardarDatos();
     }
 
     public static void cuentaAdmin(){
@@ -332,8 +340,108 @@ public class GestionDeEntradas {
         else
         System.out.println("Solo se acepta 1 o 2");
     }
+
+    public static void escribirFichero(String[][] datos, String separadorColumnas, String nombreFichero){
+        try {
+            String ruta = System.getProperty("user.dir") + File.separator + nombreFichero;
+            FileWriter writer = new FileWriter(ruta);
+
+            for (int i = 0; i < datos.length; i++) {
+                String[] fila = datos[i];
+                for (int j = 0; j < fila.length; j++) {
+                    writer.append(fila[j] == null ? " " : fila[j]);
+                    if (j < fila.length - 1)
+                        writer.append(separadorColumnas);
+                }
+                writer.append(System.lineSeparator());
+            }
+            writer.flush();
+            writer.close();
+
+            System.out.println("Archivo guardado en: " + ruta);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String[][] leerFichero(String separadorColumnas, String nombreFichero){
+        String ruta = System.getProperty("user.dir") + File.separator + nombreFichero;
+
+        List<String[]> list = new ArrayList<String[]>();
+        try {
+            Scanner scanner = new Scanner(new File(ruta));
+
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] array = line.split(separadorColumnas);
+                list.add(array);
+            }
+
+            scanner.close();
+            System.out.println("Archivo cargado desde: " + ruta);
+
+        } catch (FileNotFoundException e) {
+            System.out.println("No existe archivo: " + ruta);
+            return null;
+        }
+
+        String[][] res = new String[list.size()][];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = list.get(i);
+        }
+        return res;
+    }
+
+    public static void guardarDatos() {
+        String[][] tabla = new String[nombres.length][7];
+
+        for (int i = 0; i < nombres.length; i++) {
+            tabla[i][0] = nombres[i];
+            tabla[i][1] = apellidos[i];
+            tabla[i][2] = correos[i];
+            tabla[i][3] = String.valueOf(peliculas[i]);
+            tabla[i][4] = String.valueOf(asientosComprados[i]);
+            tabla[i][5] = String.valueOf(horario[i]);
+            tabla[i][6] = String.valueOf(precios[i]);
+        }
+
+        escribirFichero(tabla, ";", "datos.txt");
+    }
+
+    public static void cargarDatos() {
+        String[][] tabla = leerFichero(";", "datos.txt");
+        if (tabla == null) return;
+
+        for (int i = 0; i < tabla.length; i++) {
+            if (tabla[i].length < 7) continue;
+
+            nombres[i] = tabla[i][0].equals(" ") ? null : tabla[i][0];
+            apellidos[i] = tabla[i][1].equals(" ") ? null : tabla[i][1];
+            correos[i] = tabla[i][2].equals(" ") ? null : tabla[i][2];
+
+            peliculas[i] = Integer.parseInt(tabla[i][3]);
+            asientosComprados[i] = Integer.parseInt(tabla[i][4]);
+            horario[i] = Integer.parseInt(tabla[i][5]);
+            precios[i] = Double.parseDouble(tabla[i][6]);
+        }
+    }
+
+
     public static void main(String[] args){
+        cargarDatos();
         Scanner sc = new Scanner(System.in);
+        for (int i = 0; i < asientosComprados.length; i++) {
+            if (asientosComprados[i] != 0) { 
+                int pelicula = peliculas[i] - 1;   
+                int hor = horario[i];              
+                int asiento = asientosComprados[i];
+                int fila = (asiento / 10) - 1;
+                int col = (asiento % 10) - 1;
+                asientosPorPeli[pelicula][hor][fila][col] = 1; 
+            }
+        }
         menuPrincipal(sc);
+
     }
 }
