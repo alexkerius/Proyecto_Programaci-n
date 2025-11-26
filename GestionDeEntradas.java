@@ -1,6 +1,6 @@
 import java.util.Scanner;
 public class GestionDeEntradas {
-    static double precio = 5;
+    static double precioPorEntrada = 5;
     static int[][][][] asientosPorPeli = new int[5][5][10][8];
     static String[][] horariosPorPeli = {
         {"10:00", "12:00", "13:00", "16:00", "20:00"},
@@ -9,7 +9,15 @@ public class GestionDeEntradas {
         {"09:30", "12:00", "15:00", "19:00", "21:00"},
         {"11:00", "13:30", "15:30", "17:00", "19:00"}
     };
-    static int[][] compras = new int[2000][8];
+    static String[] nombres = new String[2000];
+    static String[] apellidos = new String[2000];
+    static String[] correos = new String[2000];
+    static int[] peliculas = new int[2000];
+    static int[] asientosComprados = new int[2000];
+    static int[] horario = new int[2000];
+    static double[] precios = new double[2000];
+    static String[] codigosDePromocion = {"DESC10", "CINE20", "VIP50"};
+    static double[] promoDescuentos = {0.1, 0.2, 0.5};
     
     public static void menuPrincipal(Scanner sc){
         System.out.println("Bienvenido al gestion de venta de entradas al cine! Elige una de las opciones: \n 1. Invitado. \n 2. Cuenta admin.");
@@ -48,13 +56,11 @@ public class GestionDeEntradas {
         Scanner sc = new Scanner(System.in);
         System.out.println("Que película quieres ver?\n1.Pelicula 1\n2.Pelicula 2\n3.Pelicula 3\n4.Pelicula 4\n5.Pelicula 5");
         int el3 = sc.nextInt();
-        int ind_compra = indexDePrimerNoCero(3);
         sc.nextLine();
         if(el3 != 1 && el3 != 2 && el3 != 3 && el3 != 3 && el3 != 4 && el3 != 5){
             System.out.println("Solo se acepta 1,2,3,4,5");
             comprarEntradas();
         }
-        compras[ind_compra][3] = el3;
         System.out.println("Cuando la quieres ver?");
         for(int i = 0; i < horariosPorPeli[el3-1].length; i++){
             System.out.print(horariosPorPeli[el3-1][i] + " ");
@@ -67,41 +73,82 @@ public class GestionDeEntradas {
                 ind = i;
             }
         }
-        compras[ind_compra][7] = ind; 
         System.out.println();
         boolean flag = true;
+        int numeroDeAsientos = 0;
         while(flag){
             System.out.println("Elige asientos:\nNota: Para eligir asiento, tienes que entrar dos numeros: primero corresponde a fila y el segundo a asiento. Si ya has elegido el numero de asientos suficientes, inserta 0 para seguir al siguente paso.");
             printSeats(asientosPorPeli[el3-1][ind]);
-            compras[indexDePrimerNoCero(3)][3] = el3;
             int asiento = sc.nextInt();
             sc.nextLine();
             if(asiento == 0){
                 flag = false;
             }
+            else{
+                if (asiento < 11 || asiento > 108) {  
+                    System.out.println("Formato incorrecto. Usa dos dígitos: fila + asiento (ej: 23).");
+                    continue;
+                }
 
-            if (asiento < 11 || asiento > 108) {  
-                System.out.println("Formato incorrecto. Usa dos dígitos: fila + asiento (ej: 23).");
-                continue;
-            }
+                else if(asientosPorPeli[el3-1][ind][(asiento/10)-1][(asiento%10)-1] == 1){
+                    System.out.println("El asiento ya está ocupado. Vuelve a elegirlo.");
+                    continue;
+                }
+                else{
+                    int ind_compra = indexDePrimerNoCero();
+                    asientosComprados[ind_compra] = asiento;
+                    asientosPorPeli[el3-1][ind][(asiento/10)-1][(asiento%10)-1] = 1;
+                    numeroDeAsientos++;
+                    horario[ind_compra] = ind; 
+                    peliculas[ind_compra] = el3;
+                }
 
-            if(asientosPorPeli[el3-1][ind][(asiento/10)-1][(asiento%10)-1] == 1){
-                System.out.println("El asiento ya está ocupado. Vuelve a elegirlo.");
-                continue;
             }
-            compras[ind_compra][4] = asiento / 10;
-            compras[ind_compra][5] = asiento % 10;
-            asientosPorPeli[el3-1][ind][(asiento/10)-1][(asiento%10)-1] = 1;
         }
         System.out.println("Introduce nombre");
-        String nombre = sc.nextLine();
-        compras[ind_compra][0] = nombre;
+        String nombre;
+        do {
+            nombre = sc.nextLine();
+            if (nombre.isEmpty()) System.out.println("Campo vacío. Inserta el nombre:");
+        } while (nombre.isEmpty());
+
         System.out.println("Introduce apellido");
-        String apellido = sc.nextLine();
-        compras[ind_compra][1] = apellido;
+        String apellido;
+        do {
+            apellido = sc.nextLine();
+            if (apellido.isEmpty()) System.out.println("Campo vacío. Inserta el apellido:");
+        } while (apellido.isEmpty());
         System.out.println("Introduce correo");
-        String correo = sc.nextLine();
-        compras[ind_compra][2] = correo;
+        String correo;
+        do {
+            correo = sc.nextLine();
+            if (!correo.contains("@") || correo.length() < 5) {
+                System.out.println("Correo inválido. Intenta otra vez:");
+                correo = "";
+            }
+        } while (correo.isEmpty());
+        for(int i = 0; i < nombres.length; i++){
+            if(peliculas[i] == el3 && horario[i] == ind && nombres[i] == null){
+                nombres[i] = nombre;
+                apellidos[i] = apellido;
+                correos[i] = correo;
+            }
+        }
+        System.out.println("Introduce codigo de promocion:\nSi no lo tienes inserte 0");
+        String promocion = sc.nextLine();
+        double precioFinal = numeroDeAsientos * precioPorEntrada;
+        for(int i = 0; i < codigosDePromocion.length; i++){
+            if(promocion.equals(codigosDePromocion[i])){
+                precioFinal *= promoDescuentos[i];
+            }
+        }
+        for(int i = 0; i < nombres.length; i++){
+            if(peliculas[i] == el3 && horario[i] == ind && precios[i] == 0){
+                precios[i] = precioFinal / numeroDeAsientos;
+            }
+        }
+        System.out.println(numeroDeAsientos);
+        System.out.println(precioFinal);
     }
 
     public static void printSeats(int[][] hall) {
@@ -121,9 +168,9 @@ public class GestionDeEntradas {
         }
     }
 
-    public static int indexDePrimerNoCero(int k){
-        for(int i = 0; i < compras.length; i++){
-            if(compras[i][k] == 0){
+    public static int indexDePrimerNoCero(){
+        for(int i = 0; i < asientosComprados.length; i++){
+            if(asientosComprados[i] == 0){
                 return i;
             }
         }
@@ -131,36 +178,35 @@ public class GestionDeEntradas {
     }
 
 
-    public static void devolucionEntradas(int[][] datos){
+    public static void devolucionEntradas(){
       System.out.println("\nInserte los datos de su compra: nombre, apellidos y email con el que se realizó la compra.");
-      Scanner sc=new Scanner(System.in);
+      Scanner sc = new Scanner(System.in);
       System.out.println("Inserte su nombre:");
       String nombre = sc.nextLine();
       System.out.println("Inserte sus apellidos:");
-      String apellidos = sc.nextLine();
+      String apellido = sc.nextLine();
       System.out.println("Inserte su email:");
       String email = sc.nextLine();
       boolean flag = true;
       int cnt = 0;
-      while(flag && cnt < datos.length){
-        if(nombre.equals(datos[cnt][0]) && apellidos.equals(datos[cnt][1]) && email.equals(datos[cnt][2])){
-             confirmarDevolucion(datos, cnt);
+      while(flag && cnt < nombres.length){
+        if(nombre.equals(nombres[cnt]) && apellido.equals(apellidos[cnt]) && email.equals(correos[cnt])){
+             confirmarDevolucion(cnt);
              flag = false;
         }
         cnt++;
       }
       if (flag == true){
         System.out.println("Datos incorrectos");
-        devolucionEntradas(datos);
+        devolucionEntradas();
       }
+      
     }
 
-    public static void confirmarDevolucion(int[][] datos, int i){
-      System.out.println("\nDesea efectuar la devolución de su entrada a " + datos[i][4] + "a las " + datos[i][8]);
+    public static void confirmarDevolucion(int i){
+      System.out.println("\nDesea efectuar la devolución de su entrada a " + peliculas[i] + "a las " + horario[i]);
     }
 
-
-    
     public static void cuentaAdmin(){
         Scanner sc = new Scanner(System.in);
         System.out.println("Inserte la contraseña");
@@ -171,7 +217,7 @@ public class GestionDeEntradas {
           System.out.println("Contraseña incorrecta \n");
           cuentaAdmin();
         }
-      }
+    }
   
     public static void adminStats(){
         System.out.println("\nBienvenido a las estadísticas de admin. Eliga una de las opciones: \n 1. Entradas vendidas. \n 2. Ingresos diarios. \n 3. Volver");
@@ -190,7 +236,7 @@ public class GestionDeEntradas {
           default:
             System.out.println("Solo se acepta 1, 2 o 3");
         }
-      }
+    }
       
     public static void entradasVendidas(){
         System.out.println("\nSeleccione el día de las entradas vendidas: \n 1. Hoy \n 2. Ayer \n 3. Volver");
@@ -210,7 +256,7 @@ public class GestionDeEntradas {
           default:
             System.out.println("Solo se acepta 1, 2 o 3");
         }
-      }
+    }
   
     public static void ventasHoy(int vh, int va){
         System.out.println("\nEntradas vendidas hoy: "+vh);
@@ -224,7 +270,7 @@ public class GestionDeEntradas {
           menuPrincipal(sc);
         else
           System.out.println("Solo se acepta 1 o 2");
-      }
+    }
 
     public static void ventasAyer(int vh, int va){
         System.out.println("\nEntradas vendidas ayer: "+vh);
@@ -238,9 +284,10 @@ public class GestionDeEntradas {
             menuPrincipal(sc);
         else
           System.out.println("Solo se acepta 1 o 2");
-      }
+    }
+
     public static void ingresosDiarios(){
-        System.out.println("\nSeleccione el día de las entradas vendidas: \n 1. Hoy \n 2. Ayer \n 3. Volver");
+            System.out.println("\nSeleccione el día de las entradas vendidas: \n 1. Hoy \n 2. Ayer \n 3. Volver");
         Scanner sc = new Scanner(System.in);
         int día = sc.nextInt();
         int dineroHoy = (int)(Math.random() * 101);             //Sustituir por variables no random.
@@ -256,45 +303,37 @@ public class GestionDeEntradas {
             adminStats();
           default:
             System.out.println("Solo se acepta 1, 2 o 3");}
-        }
-    
-  public static void ingresosHoy(int ih, int ia){
-    System.out.println("\nIngresos de hoy: "+ih);
-    System.out.println("Aumento respecto ayer: "+(ih*100/ia)+"%");
-    System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
-    Scanner sc = new Scanner(System.in);
-    int op = sc.nextInt();
-    if (op==1)
-      entradasVendidas();
-    else if (op==2)
-      menuPrincipal(sc);
-    else
-      System.out.println("Solo se acepta 1 o 2");
-  }
-
-  public static void ingresosAyer(int ih, int ia){
-    System.out.println("\nIngresos de ayer: "+ih);
-    System.out.println("Aumento de hoy: "+(ih*100/ia)+"%");
-    System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
-    Scanner sc = new Scanner(System.in);
-    int op = sc.nextInt();
-    if (op==1)
-      entradasVendidas();
-    else if (op==2)
+    }
+        
+    public static void ingresosHoy(int ih, int ia){
+        System.out.println("\nIngresos de hoy: "+ih);
+        System.out.println("Aumento respecto ayer: "+(ih*100/ia)+"%");
+        System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
+        Scanner sc = new Scanner(System.in);
+        int op = sc.nextInt();
+        if (op==1)
+        entradasVendidas();
+        else if (op==2)
         menuPrincipal(sc);
-    else
-      System.out.println("Solo se acepta 1 o 2");
-  }
+        else
+        System.out.println("Solo se acepta 1 o 2");
+    }
 
-
-
-    
-    public static void main(String[] args){
-            Scanner sc = new Scanner(System.in);
+    public static void ingresosAyer(int ih, int ia){
+        System.out.println("\nIngresos de ayer: "+ih);
+        System.out.println("Aumento de hoy: "+(ih*100/ia)+"%");
+        System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
+        Scanner sc = new Scanner(System.in);
+        int op = sc.nextInt();
+        if (op==1)
+        entradasVendidas();
+        else if (op==2)
             menuPrincipal(sc);
-        }
+        else
+        System.out.println("Solo se acepta 1 o 2");
+    }
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        menuPrincipal(sc);
+    }
 }
-
-
-
-
