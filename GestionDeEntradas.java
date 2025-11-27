@@ -1,4 +1,4 @@
-// Falta corregir funciones de borrar compra
+// Falta corregir funciones de borrar compra, actualizar funcionces de devolucion y ponerlo todo limpio
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -532,3 +532,4 @@ public class GestionDeEntradas {
 
     }
 }
+
