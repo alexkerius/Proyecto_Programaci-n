@@ -1,4 +1,4 @@
-// Falta corregir funciones de borrar compra, actualizar funcionces de devolucion y ponerlo todo limpio
+// Falta actualizar funcionces de devolucion y ponerlo todo limpio
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -35,6 +35,7 @@ public class GestionDeEntradas {
             cuentaInvitado();
         }
         else if(el1 == 2){
+            sc.nextLine();
             cuentaAdmin();
         }
         else{
@@ -66,7 +67,7 @@ public class GestionDeEntradas {
         int el3 = sc.nextInt();
         sc.nextLine();
         if (el3 == -1) {
-            int idx = indexDePrimerNoCero() - 1;
+            int idx = indexDePrimerCero(asientosComprados) - 1;
             if (idx >= 0) {
                 borrarCompra(idx); 
             }
@@ -83,7 +84,7 @@ public class GestionDeEntradas {
         System.out.println();
         String hora = sc.nextLine();
         if (hora.equals("-1")) {
-            int idx = indexDePrimerNoCero() - 1;
+            int idx = indexDePrimerCero(asientosComprados) - 1;
             if (idx >= 0) {
                 borrarCompra(idx);
             }
@@ -98,16 +99,26 @@ public class GestionDeEntradas {
         System.out.println();
         boolean flag = true;
         int numeroDeAsientos = 0;
+        int[] asientosElegidos = new int[80];
+        int startIdx = indexDePrimerCero(asientosComprados);
         while(flag){
             System.out.println("Elige asientos:\nNota: Para eligir asiento, tienes que entrar dos numeros: primero corresponde a fila y el segundo a asiento. Si ya has elegido el numero de asientos suficientes, inserta 0 para seguir al siguente paso.");
             printSeats(asientosPorPeli[el3-1][ind]);
             int asiento = sc.nextInt();
             sc.nextLine();
             if (asiento == -1) {
-                int idx = indexDePrimerNoCero() - 1;
+                int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
-                    borrarCompra(idx); 
-                }
+                    for(int i = 0; i < asientosElegidos.length; i++){
+                        if(asientosElegidos[i] != 0){
+                            asientosPorPeli[el3-1][ind][(asientosElegidos[i] / 10) - 1][(asientosElegidos[i] % 10) - 1] = 0;
+                        }
+                    }
+                    int endIdx = indexDePrimerCero(asientosComprados);  
+                    for (int k = startIdx; k < endIdx; k++) {
+                        borrarCompra(k);
+                    }
+                  }
                 comprarEntradas();
             }
             if(asiento == 0){
@@ -124,7 +135,8 @@ public class GestionDeEntradas {
                     continue;
                 }
                 else{
-                    int ind_compra = indexDePrimerNoCero();
+                    asientosElegidos[indexDePrimerCero(asientosElegidos)] = asiento;
+                    int ind_compra = indexDePrimerCero(asientosComprados);
                     asientosComprados[ind_compra] = asiento;
                     asientosPorPeli[el3-1][ind][(asiento/10)-1][(asiento%10)-1] = 1;
                     numeroDeAsientos++;
@@ -139,9 +151,17 @@ public class GestionDeEntradas {
         do {
             nombre = sc.nextLine();
             if (nombre.equals("-1")) {
-                int idx = indexDePrimerNoCero() - 1;
+                int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
-                    borrarCompra(idx);
+                    for(int i = 0; i < asientosElegidos.length; i++){
+                        if(asientosElegidos[i] != 0){
+                            asientosPorPeli[el3-1][ind][(asientosElegidos[i] / 10) - 1][(asientosElegidos[i] % 10) - 1] = 0;
+                        }
+                    }
+                    int endIdx = indexDePrimerCero(asientosComprados);  
+                    for (int k = startIdx; k < endIdx; k++) {
+                        borrarCompra(k);
+                    }
                 }
                 comprarEntradas(); 
             }
@@ -153,9 +173,17 @@ public class GestionDeEntradas {
         do {
             apellido = sc.nextLine();
             if (apellido.equals("-1")) {
-                int idx = indexDePrimerNoCero() - 1;
+                int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
-                    borrarCompra(idx);
+                    for(int i = 0; i < asientosElegidos.length; i++){
+                        if(asientosElegidos[i] != 0){
+                            asientosPorPeli[el3-1][ind][(asientosElegidos[i] / 10) - 1][(asientosElegidos[i] % 10) - 1] = 0;
+                        }
+                    }
+                    int endIdx = indexDePrimerCero(asientosComprados);  
+                    for (int k = startIdx; k < endIdx; k++) {
+                        borrarCompra(k);
+                    }
                 }
                 comprarEntradas(); 
             }
@@ -166,9 +194,17 @@ public class GestionDeEntradas {
         do {
             correo = sc.nextLine();
             if (correo.equals("-1")) {
-                int idx = indexDePrimerNoCero() - 1;
+                int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
-                    borrarCompra(idx);
+                    for(int i = 0; i < asientosElegidos.length; i++){
+                        if(asientosElegidos[i] != 0){
+                            asientosPorPeli[el3-1][ind][(asientosElegidos[i] / 10) - 1][(asientosElegidos[i] % 10) - 1] = 0;
+                        }
+                    }
+                    int endIdx = indexDePrimerCero(asientosComprados);  
+                    for (int k = startIdx; k < endIdx; k++) {
+                        borrarCompra(k);
+                    }
                 }
                 comprarEntradas(); 
             }
@@ -186,10 +222,7 @@ public class GestionDeEntradas {
         }
         System.out.println("Introduce codigo de promocion:\nSi no lo tienes inserte 0");
         String promocion = sc.nextLine();
-        if (promocion.equals("-1")) {
-            comprarEntradas();
-        }
-
+        
         double precioFinal = numeroDeAsientos * precioPorEntrada;
         for(int i = 0; i < codigosDePromocion.length; i++){
             if(promocion.equals(codigosDePromocion[i])){
@@ -223,9 +256,9 @@ public class GestionDeEntradas {
         }
     }
 
-    public static int indexDePrimerNoCero(){
-        for(int i = 0; i < asientosComprados.length; i++){
-            if(asientosComprados[i] == 0){
+    public static int indexDePrimerCero(int arr[]){
+        for(int i = 0; i < arr.length; i++){
+            if(arr[i] == 0){
                 return i;
             }
         }
@@ -233,13 +266,6 @@ public class GestionDeEntradas {
     }
 
     public static void borrarCompra(int index) {
-        int peli = peliculas[index];
-        int hor = horario[index];
-        int asiento = asientosComprados[index];
-
-        if (asiento != 0 && peli != 0) {
-            asientosPorPeli[peli - 1][hor][(asiento / 10) - 1][(asiento % 10) - 1] = 0;
-        }
         nombres[index] = null;
         apellidos[index] = null;
         correos[index] = null;
@@ -280,7 +306,6 @@ public class GestionDeEntradas {
     }
 
     public static void cuentaAdmin(){
-        sc.nextLine();
         System.out.println("Inserte la contraseña");
         String cont = sc.nextLine();
         if (cont.equals("234")){
@@ -311,7 +336,7 @@ public class GestionDeEntradas {
     }
       
     public static void entradasVendidas(){
-        System.out.println("\nElige una de las opciones: 1. Entradas vendidas a Pelicula 1\n2. Entradas vendidas a Pelicula 2\n3. Entradas vendidas a Pelicula 3\n4. Entradas vendidas a Pelicula 4\n5. Entradas vendidas a Pelicula 5\n6. Entradas vendidas totales\n7. Volver");
+        System.out.println("\nElige una de las opciones:\n1. Entradas vendidas a Pelicula 1\n2. Entradas vendidas a Pelicula 2\n3. Entradas vendidas a Pelicula 3\n4. Entradas vendidas a Pelicula 4\n5. Entradas vendidas a Pelicula 5\n6. Entradas vendidas totales\n7. Volver");
         int entradas = sc.nextInt();
         switch (entradas){
             case 1:
@@ -351,7 +376,7 @@ public class GestionDeEntradas {
         }
         else{
             for(int i = 0; i < peliculas.length; i++){
-                if(peliculas[i] == peli){
+                if(peliculas[i] == peli + 1){
                     entradasVenta++;
                 }
             }
@@ -405,21 +430,21 @@ public class GestionDeEntradas {
                     ingresoTotal += precios[i];
                 } 
             }
-            System.out.println("Entradas vendidas totales: " + ingresoTotal);
+            System.out.println("Ingresos totales: " + ingresoTotal);
         }
         else{
             for(int i = 0; i < peliculas.length; i++){
-                if(peliculas[i] == peli){
+                if(peliculas[i] == peli + 1){
                     ingresoTotal += precios[i];
                 }
             }
-            System.out.println("Entradas vendidas a Pelicula " + (peli + 1) + ": " + ingresoTotal);
+            System.out.println("Ingresos relacionado a Pelicula " + (peli + 1) + ": " + ingresoTotal);
         }
-        System.out.println("Entradas vendidas");
+        System.out.println("Ingresos Totales");
         System.out.println(" Pulse 1 para volver a atrás. \n Pulse 2 para volver al menú principal");
         int op = sc.nextInt();
         if (op==1){
-          entradasVendidas();
+          ingresosTotales();
         }
         else if (op==2){
           menuPrincipal();
@@ -532,4 +557,5 @@ public class GestionDeEntradas {
 
     }
 }
+
 
