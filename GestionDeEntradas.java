@@ -1,4 +1,4 @@
-// Falta actualizar funcionces de devolucion y ponerlo todo limpio
+// falta ponerlo todo limpio
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -277,32 +277,81 @@ public class GestionDeEntradas {
 
 
     public static void devolucionEntradas(){
-      System.out.println("\nInserte los datos de su compra: nombre, apellidos y email con el que se realizó la compra.");
-      System.out.println("Inserte su nombre:");
-      String nombre = sc.nextLine();
-      System.out.println("Inserte sus apellidos:");
-      String apellido = sc.nextLine();
-      System.out.println("Inserte su email:");
-      String email = sc.nextLine();
-      boolean flag = true;
-      int cnt = 0;
-      while(flag && cnt < nombres.length){
-        if(nombre.equals(nombres[cnt]) && apellido.equals(apellidos[cnt]) && email.equals(correos[cnt])){
-             confirmarDevolucion(cnt);
-             flag = false;
+        sc.nextLine();
+        System.out.println("\nInserte los datos de su compra: nombre, apellidos y email con el que se realizó la compra.");
+
+        System.out.println("Inserte su nombre:");
+        String nombre = sc.nextLine().trim();
+
+        System.out.println("Inserte sus apellidos:");
+        String apellido = sc.nextLine().trim();
+
+        System.out.println("Inserte su email:");
+        String email = sc.nextLine().trim();
+
+        boolean encontrado = false;
+        int[] indicesEncontrados = new int[2000];
+        for(int i = 0; i < 2000; i++){
+            indicesEncontrados[i] = -1;
         }
-        cnt++;
-      }
-      if (flag == true){
-        System.out.println("Datos incorrectos");
-        devolucionEntradas();
-      }
-      
+        int cnt = 0;
+        while(!encontrado && cnt < nombres.length-1){
+            if (nombres[cnt] != null && apellidos[cnt] != null && correos[cnt] != null) {
+                if (nombres[cnt].trim().equalsIgnoreCase(nombre)
+                    && apellidos[cnt].trim().equalsIgnoreCase(apellido)
+                    && correos[cnt].trim().equalsIgnoreCase(email) && correos[cnt+1].trim().equalsIgnoreCase(email)) {
+                    boolean unoNegativoEncontrado = false;
+                    int cnt1 = 0;
+                    while(!unoNegativoEncontrado){
+                        if(indicesEncontrados[cnt1] == -1){
+                            indicesEncontrados[cnt1] = cnt;
+                            unoNegativoEncontrado = true;
+                        }
+                        cnt1++;
+                    }
+                }
+                else if (nombres[cnt].trim().equalsIgnoreCase(nombre)
+                    && apellidos[cnt].trim().equalsIgnoreCase(apellido)
+                    && correos[cnt].trim().equalsIgnoreCase(email) && !correos[cnt+1].trim().equalsIgnoreCase(email)) {
+                    encontrado = true;
+                    boolean unoNegativoEncontrado = false;
+                    int cnt1 = 0;
+                    while(!unoNegativoEncontrado){
+                        if(indicesEncontrados[cnt1] == -1){
+                            indicesEncontrados[cnt1] = cnt;
+                            unoNegativoEncontrado = true;
+                        }
+                        cnt1++;
+                    }
+                }
+            }
+            cnt++;
+        }
+
+        if (encontrado) {
+            System.out.println("Compra encontrada. Devolucion efectuada");
+            confirmarDevolucion(indicesEncontrados);
+        } else {
+            System.out.println("Datos no encontrados.");
+            System.out.println("Pulsa 1 para intentar otra vez, 2 para volver al menu anterior.");
+            String opt = sc.nextLine();
+            if (opt.equals("1")) {
+                devolucionEntradas();
+            } else {
+                cuentaInvitado();
+            }
+        }
     }
 
-    public static void confirmarDevolucion(int i){
-      System.out.println("\nDesea efectuar la devolución de su entrada a " + peliculas[i] + "a las " + horario[i]);
-      guardarDatos();
+
+    public static void confirmarDevolucion(int[] arr){
+        for(int i = 0; i < arr.length; i++){
+            if(arr[i] != -1){
+                System.out.println(arr[i]);
+                borrarCompra(arr[i]);
+            }
+        }
+        guardarDatos();
     }
 
     public static void cuentaAdmin(){
