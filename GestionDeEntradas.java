@@ -83,6 +83,7 @@ public class GestionDeEntradas {
      */
     public static void comprarEntradas(){
         System.out.println("Que película quieres ver?\n1.Wicked(For goon)\n2.Barbie\n3.Roblox: The movie\n4.Yago comiendo a Dulce\n5.Pelicula 5");
+        System.out.println("Si quieres volver al menu anterior, pulsa -1");
         int el3 = sc.nextInt();
         sc.nextLine(); // Limpiar buffer
         // Si el usuario introduce -1, cancela y vuelve atrás
@@ -100,6 +101,7 @@ public class GestionDeEntradas {
         }
         // Mostrar horarios disponibles para la película seleccionada
         System.out.println("Cuando la quieres ver?");
+        System.out.println("Si quieres volver al menu anterior, pulsa -1");
         for(int i = 0; i < horariosPorPeli[el3-1].length; i++){
             System.out.print(horariosPorPeli[el3-1][i] + " ");
         }
@@ -128,6 +130,7 @@ public class GestionDeEntradas {
         int startIdx = indexDePrimerCero(asientosComprados); // Marca dónde empezamos
         while(flag){
             System.out.println("Elige asientos:\nNota: Para eligir asiento, tienes que entrar dos numeros: primero corresponde a fila y el segundo a asiento. Si ya has elegido el numero de asientos suficientes, inserta 0 para seguir al siguente paso.");
+            System.out.println("Si quieres volver al menu anterior, pulsa -1");
             // Muestra la matriz de asientos
             printSeats(asientosPorPeli[el3-1][ind]);
             int asiento = sc.nextInt();
