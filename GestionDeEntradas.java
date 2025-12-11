@@ -1,4 +1,3 @@
-// falta ponerlo todo limpio
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -226,7 +225,7 @@ public class GestionDeEntradas {
         double precioFinal = numeroDeAsientos * precioPorEntrada;
         for(int i = 0; i < codigosDePromocion.length; i++){
             if(promocion.equals(codigosDePromocion[i])){
-                precioFinal *= promoDescuentos[i];
+                precioFinal -= precioFinal * promoDescuentos[i];
             }
         }
         for(int i = 0; i < nombres.length; i++){
@@ -234,8 +233,8 @@ public class GestionDeEntradas {
                 precios[i] = precioFinal / numeroDeAsientos;
             }
         }
-        System.out.println(numeroDeAsientos);
-        System.out.println(precioFinal);
+        System.out.println("Numeros de asientos reservados " + numeroDeAsientos);
+        System.out.println("Precio final pagado por entradas " + precioFinal);
         guardarDatos();
     }
 
@@ -276,8 +275,9 @@ public class GestionDeEntradas {
     }
 
 
-    public static void devolucionEntradas(){
-        sc.nextLine();
+
+    public static void devolucionEntradas() {
+        sc.nextLine(); // очистка буфера
         System.out.println("\nInserte los datos de su compra: nombre, apellidos y email con el que se realizó la compra.");
 
         System.out.println("Inserte su nombre:");
@@ -289,68 +289,52 @@ public class GestionDeEntradas {
         System.out.println("Inserte su email:");
         String email = sc.nextLine().trim();
 
-        boolean encontrado = false;
-        int[] indicesEncontrados = new int[2000];
-        for(int i = 0; i < 2000; i++){
-            indicesEncontrados[i] = -1;
-        }
-        int cnt = 0;
-        while(!encontrado && cnt < nombres.length-1){
-            if (nombres[cnt] != null && apellidos[cnt] != null && correos[cnt] != null) {
-                if (nombres[cnt].trim().equalsIgnoreCase(nombre)
-                    && apellidos[cnt].trim().equalsIgnoreCase(apellido)
-                    && correos[cnt].trim().equalsIgnoreCase(email) && correos[cnt+1].trim().equalsIgnoreCase(email)) {
-                    boolean unoNegativoEncontrado = false;
-                    int cnt1 = 0;
-                    while(!unoNegativoEncontrado){
-                        if(indicesEncontrados[cnt1] == -1){
-                            indicesEncontrados[cnt1] = cnt;
-                            unoNegativoEncontrado = true;
-                        }
-                        cnt1++;
-                    }
-                }
-                else if (nombres[cnt].trim().equalsIgnoreCase(nombre)
-                    && apellidos[cnt].trim().equalsIgnoreCase(apellido)
-                    && correos[cnt].trim().equalsIgnoreCase(email) && !correos[cnt+1].trim().equalsIgnoreCase(email)) {
-                    encontrado = true;
-                    boolean unoNegativoEncontrado = false;
-                    int cnt1 = 0;
-                    while(!unoNegativoEncontrado){
-                        if(indicesEncontrados[cnt1] == -1){
-                            indicesEncontrados[cnt1] = cnt;
-                            unoNegativoEncontrado = true;
-                        }
-                        cnt1++;
-                    }
-                }
+        int[] indicesEncontrados = new int[nombres.length];
+        int count = 0;
+
+        for (int i = 0; i < nombres.length; i++) {
+            if (nombres[i] == null || apellidos[i] == null || correos[i] == null) continue;
+
+            if (nombres[i].trim().equalsIgnoreCase(nombre)
+                && apellidos[i].trim().equalsIgnoreCase(apellido)
+                && correos[i].trim().equalsIgnoreCase(email)) {
+                indicesEncontrados[count] = i;
+                count++;
             }
-            cnt++;
         }
 
-        if (encontrado) {
-            System.out.println("Compra encontrada. Devolucion efectuada");
-            confirmarDevolucion(indicesEncontrados);
-        } else {
+        if (count == 0) {
             System.out.println("Datos no encontrados.");
             System.out.println("Pulsa 1 para intentar otra vez, 2 para volver al menu anterior.");
-            String opt = sc.nextLine();
+            String opt = sc.nextLine().trim();
             if (opt.equals("1")) {
                 devolucionEntradas();
             } else {
                 cuentaInvitado();
             }
+            return;
         }
+
+        int[] indices = new int[count];
+        for (int i = 0; i < count; i++) {
+            indices[i] = indicesEncontrados[i];
+        }
+
+        System.out.println("Compra(s) encontrada(s): " + count);
+        confirmarDevolucion(indices);
     }
 
 
+
     public static void confirmarDevolucion(int[] arr){
+        double suma = 0;
         for(int i = 0; i < arr.length; i++){
             if(arr[i] != -1){
-                System.out.println(arr[i]);
+                suma += precios[arr[i]];
                 borrarCompra(arr[i]);
             }
         }
+        System.out.println("Devolucion efectuada con cantidad de dinero " + suma);
         guardarDatos();
     }
 
@@ -520,8 +504,6 @@ public class GestionDeEntradas {
             writer.flush();
             writer.close();
 
-            System.out.println("Archivo guardado en: " + ruta);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -541,10 +523,8 @@ public class GestionDeEntradas {
             }
 
             scanner.close();
-            System.out.println("Archivo cargado desde: " + ruta);
 
         } catch (FileNotFoundException e) {
-            System.out.println("No existe archivo: " + ruta);
             return null;
         }
 
@@ -556,6 +536,37 @@ public class GestionDeEntradas {
     }
 
     public static void guardarDatos() {
+       int posNull = -1;
+
+        for (int i = 0; i < nombres.length; i++) {
+
+            if (nombres[i] == null && posNull == -1) {
+                posNull = i;
+            }
+
+            if (posNull != -1 && nombres[i] != null) {
+
+                nombres[posNull] = nombres[i];
+                apellidos[posNull] = apellidos[i];
+                correos[posNull] = correos[i];
+                peliculas[posNull] = peliculas[i];
+                asientosComprados[posNull] = asientosComprados[i];
+                horario[posNull] = horario[i];
+                precios[posNull] = precios[i];
+
+                
+                nombres[i] = null;
+                apellidos[i] = null;
+                correos[i] = null;
+                peliculas[i] = 0;
+                asientosComprados[i] = 0;
+                horario[i] = 0;
+                precios[i] = 0;
+
+                
+                posNull++;
+            }
+        }
         String[][] tabla = new String[nombres.length][7];
 
         for (int i = 0; i < nombres.length; i++) {
@@ -578,11 +589,27 @@ public class GestionDeEntradas {
         for (int i = 0; i < tabla.length; i++) {
             if (tabla[i].length < 7) continue;
 
-            nombres[i] = tabla[i][0].equals(" ") ? null : tabla[i][0];
-            apellidos[i] = tabla[i][1].equals(" ") ? null : tabla[i][1];
-            correos[i] = tabla[i][2].equals(" ") ? null : tabla[i][2];
+            if (tabla[i][0].equals(" ")) {
+                nombres[i] = null;
+            } 
+            else {
+                nombres[i] = tabla[i][0];           
+            }
+            if (tabla[i][1].equals(" ")) {
+                apellidos[i] = null;
+            } 
+            else {
+                apellidos[i] = tabla[i][1];           
+            }
+            if (tabla[i][2].equals(" ")) {
+                correos[i] = null;
+            } 
+            else {
+                correos[i] = tabla[i][2];           
+            }
+            
 
-            peliculas[i] = Integer.parseInt(tabla[i][3]);
+            peliculas[i] = Integer.parseInt(tabla[i][3]); // parseInt transforma String a int
             asientosComprados[i] = Integer.parseInt(tabla[i][4]);
             horario[i] = Integer.parseInt(tabla[i][5]);
             precios[i] = Double.parseDouble(tabla[i][6]);
