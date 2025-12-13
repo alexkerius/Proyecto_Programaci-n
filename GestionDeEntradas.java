@@ -94,11 +94,13 @@ public class GestionDeEntradas {
                 borrarCompra(idx); 
             }
             cuentaInvitado();
+            return;
         }
         //Validación de entrada. Comprueba que la película seleccionada es una de las 5 ofrecidas.
         if(el3 != 1 && el3 != 2 && el3 != 3 && el3 != 4 && el3 != 5){
             System.out.println("Solo se acepta 1,2,3,4,5");
             comprarEntradas();
+            return;
         }
         //Mostrar horarios disponibles para la película seleccionada
         System.out.println("Cuando la quieres ver?");
@@ -114,7 +116,8 @@ public class GestionDeEntradas {
             if (idx >= 0) {
                 borrarCompra(idx);
             }
-            comprarEntradas(); 
+            comprarEntradas();
+            return; 
         }
         //Buscar el índice del horario seleccionado
         int ind = -1;
@@ -153,6 +156,7 @@ public class GestionDeEntradas {
                     }
                   }
                 comprarEntradas();
+                return;
             }
             //0 indica que el usuario terminó de elegir asientos
             if(asiento == 0){
@@ -207,6 +211,7 @@ public class GestionDeEntradas {
                     }
                 }
                 comprarEntradas(); 
+                return;
             }
             if (nombre.isEmpty()) System.out.println("Campo vacío. Inserta el nombre:");
         } while (nombre.isEmpty());
@@ -230,6 +235,7 @@ public class GestionDeEntradas {
                     }
                 }
                 comprarEntradas(); 
+                return;
             }
             if (apellido.isEmpty()) System.out.println("Campo vacío. Inserta el apellido:");
         } while (apellido.isEmpty());
@@ -251,7 +257,8 @@ public class GestionDeEntradas {
                         borrarCompra(k);
                     }
                 }
-                comprarEntradas(); 
+                comprarEntradas();
+                return; 
             }
             //Comprobación de correo válido.
             if (!correo.contains("@") || correo.length() < 5) {
@@ -707,5 +714,3 @@ public class GestionDeEntradas {
 
     }
 }
-
-
