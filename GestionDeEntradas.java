@@ -5,19 +5,22 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileWriter;
-/**
- * Clase principal para la Gestión de Entradas de Cine.
- * Permite comprar entradas, devolverlas, administrar estadísticas y guardar/cargar datos en ficheros.
- */
+
+//Clase principal para la Gestión de Entradas de Cine.
+//Permite comprar entradas, devolverlas, administrar estadísticas y guardar/cargar datos en ficheros.
 public class GestionDeEntradas {
-    // Escáner global para leer la entrada del usuario
+    
+    //Escáner global para leer la entrada del usuario.
     static Scanner sc = new Scanner(System.in);
-    // Precio base por entrada
+    
+    //Precio base por entrada.
     static double precioPorEntrada = 5;
-    // Estructura para guardar el estado de los asientos.
-    // Dimensiones: [Película][Horario][Fila][Asiento]
+    
+    //Estructura para guardar el estado de los asientos.
+    //Dimensiones: [Película][Horario][Fila][Asiento]
     static int[][][][] asientosPorPeli = new int[5][5][10][8];
-    // Horarios predefinidos para las 5 películas
+    
+    //Horarios predefinidos para las 5 películas.
     static String[][] horariosPorPeli = {
         {"10:00", "12:00", "13:00", "16:00", "20:00"},
         {"9:00",  "11:00", "12:00", "14:00", "17:00"},
@@ -25,9 +28,9 @@ public class GestionDeEntradas {
         {"09:30", "12:00", "15:00", "19:00", "21:00"},
         {"11:00", "13:30", "15:30", "17:00", "19:00"}
     };
-    // Arrays paralelos
-    // Estos arrays almacenan la información de cada entrada vendida.
-    // Usan el mismo índice 'i' para referirse a la misma transacción.
+    
+    //Estos arrays almacenan la información de cada entrada vendida.
+    //Usan el mismo índice 'i' para referirse a la misma transacción.
     static String[] nombres = new String[2000];
     static String[] apellidos = new String[2000];
     static String[] correos = new String[2000];
@@ -35,13 +38,13 @@ public class GestionDeEntradas {
     static int[] asientosComprados = new int[2000];
     static int[] horario = new int[2000];
     static double[] precios = new double[2000];
-    // Datos para descuentos
+    
+    //Datos para descuentos
     static String[] codigosDePromocion = {"DESC10", "CINE20", "VIP50"};
     static double[] promoDescuentos = {0.1, 0.2, 0.5};
-    /**
-     * Muestra el menú principal al iniciar el programa.
-     * Separa el flujo entre usuarios normales (invitados) y administradores.
-     */
+    
+    //Muestra el menú principal al iniciar el programa.
+    //Separa el flujo entre usuarios invitados y administradores.
     public static void menuPrincipal(){
         System.out.println("Bienvenido al gestion de venta de entradas al cine! Elige una de las opciones: \n 1. Invitado. \n 2. Cuenta admin.");
         int el1 = sc.nextInt();
@@ -49,17 +52,16 @@ public class GestionDeEntradas {
             cuentaInvitado();
         }
         else if(el1 == 2){
-            sc.nextLine(); // Limpiar el buffer del scanner
+            sc.nextLine(); //Necesario para limpiar el cambio de línea, sin esto se saltaría el último sc.nextLine()
             cuentaAdmin();
         }
         else{
             System.out.println("Solo se acepta 1 o 2");
-            menuPrincipal(); // Recursividad si se equivoca
+            menuPrincipal(); //Recursividad por si el usuario se equivoca.
         }
     }
-    /**
-     * Menú para el usuario cliente.
-     */
+    
+    //Menú para el usuario invitado.
     public static void cuentaInvitado(){
         System.out.println("Elige una de las opciones: \n1. Comprar entradas. \n2. Devolución de entradas. \n3. Ir atrás.");
         int el2 = sc.nextInt();
@@ -74,19 +76,18 @@ public class GestionDeEntradas {
         }
         else{
             System.out.println("Solo se acepta 1 o 2 o 3");
-            cuentaInvitado();
+            cuentaInvitado(); //Recursividad por si el usuario se equivoca.
         }
     }
-    /**
-     * Lógica principal de compra.
-     * Flujo: Elegir película -> Elegir hora -> Elegir asientos -> Datos personales -> Pago.
-     */
+    
+    //Función principal de compra.
+    //Orden: Selección de película -> Selección de hora -> Selección de asientos -> Datos personales -> Pago.
     public static void comprarEntradas(){
-        System.out.println("Que película quieres ver?\n1.Wicked(For goon)\n2.Barbie\n3.Roblox: The movie\n4.Yago comiendo a Dulce\n5.Pelicula 5");
+        System.out.println("¿Qué película quieres ver?\n1.Wicked(For Good)\n2.Barbie\n3.Roblox: The movie\n4.Yago comiendo\n5.Five Nights at Freddy's 2");
         System.out.println("Si quieres volver al menu anterior, pulsa -1");
         int el3 = sc.nextInt();
-        sc.nextLine(); // Limpiar buffer
-        // Si el usuario introduce -1, cancela y vuelve atrás
+        sc.nextLine(); //Necesario para limpiar el cambio de línea, sin esto se saltaría el último sc.nextLine()
+                       //Si el usuario introduce -1, cancela y vuelve atrás
         if (el3 == -1) {
             int idx = indexDePrimerCero(asientosComprados) - 1;
             if (idx >= 0) {
@@ -94,12 +95,12 @@ public class GestionDeEntradas {
             }
             cuentaInvitado();
         }
-        // Validación de entrada
-        if(el3 != 1 && el3 != 2 && el3 != 3 && el3 != 3 && el3 != 4 && el3 != 5){
+        //Validación de entrada. Comprueba que la película seleccionada es una de las 5 ofrecidas.
+        if(el3 != 1 && el3 != 2 && el3 != 3 && el3 != 4 && el3 != 5){
             System.out.println("Solo se acepta 1,2,3,4,5");
             comprarEntradas();
         }
-        // Mostrar horarios disponibles para la película seleccionada
+        //Mostrar horarios disponibles para la película seleccionada
         System.out.println("Cuando la quieres ver?");
         System.out.println("Si quieres volver al menu anterior, pulsa -1");
         for(int i = 0; i < horariosPorPeli[el3-1].length; i++){
@@ -107,7 +108,7 @@ public class GestionDeEntradas {
         }
         System.out.println();
         String hora = sc.nextLine();
-        // Lógica de cancelación con -1
+        //Si el usuario introduce -1, cancela, vuelve atrás y elimina el registro de la compra.
         if (hora.equals("-1")) {
             int idx = indexDePrimerCero(asientosComprados) - 1;
             if (idx >= 0) {
@@ -115,7 +116,7 @@ public class GestionDeEntradas {
             }
             comprarEntradas(); 
         }
-        // Buscar el índice del horario seleccionado
+        //Buscar el índice del horario seleccionado
         int ind = -1;
         for(int i = 0; i < horariosPorPeli[el3-1].length; i++){
             if(hora.equals(horariosPorPeli[el3 - 1][i])){
@@ -123,30 +124,29 @@ public class GestionDeEntradas {
             }
         }
         System.out.println();
-        // Bucle de selección de asientos
+        //Bucle de selección de asientos
         boolean flag = true;
         int numeroDeAsientos = 0;
-        int[] asientosElegidos = new int[80]; // Temporal para guardar selección actual
-        int startIdx = indexDePrimerCero(asientosComprados); // Marca dónde empezamos
+        int[] asientosElegidos = new int[80]; //Temporal para guardar selección actual.
+        int startIdx = indexDePrimerCero(asientosComprados); //Marca dónde empezamos.
         while(flag){
             System.out.println("Elige asientos:\nNota: Para eligir asiento, tienes que entrar dos numeros: primero corresponde a fila y el segundo a asiento. Si ya has elegido el numero de asientos suficientes, inserta 0 para seguir al siguente paso.");
             System.out.println("Si quieres volver al menu anterior, pulsa -1");
-            // Muestra la matriz de asientos
+            //Muestra la matriz de asientos
             printSeats(asientosPorPeli[el3-1][ind]);
             int asiento = sc.nextInt();
             sc.nextLine();
-            // Cancelar compra durante selección de asientos
             if (asiento == -1) {
-                // Lógica de reversión de asientos seleccionados
+                //Lógica de cancelación de operación.
                 int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
-                    // Liberar asientos en la matriz visual
+                    //Liberar asientos en la matriz visual.
                     for(int i = 0; i < asientosElegidos.length; i++){
                         if(asientosElegidos[i] != 0){
                             asientosPorPeli[el3-1][ind][(asientosElegidos[i] / 10) - 1][(asientosElegidos[i] % 10) - 1] = 0;
                         }
                     }
-                    // Borrar datos temporales de los arrays
+                    //Borrar datos temporales de los arrays.
                     int endIdx = indexDePrimerCero(asientosComprados);  
                     for (int k = startIdx; k < endIdx; k++) {
                         borrarCompra(k);
@@ -154,29 +154,29 @@ public class GestionDeEntradas {
                   }
                 comprarEntradas();
             }
-            // 0 indica que el usuario terminó de elegir asientos
+            //0 indica que el usuario terminó de elegir asientos
             if(asiento == 0){
                 flag = false;
             }
             else{
-                // Validación del formato de asiento (ej: 11 a 108, evitando filas/columnas > 10 u 8)
+                //Comprobación del formato correcto del asiento.
                 if (asiento < 11 || asiento > 108) {  
                     System.out.println("Formato incorrecto. Usa dos dígitos: fila + asiento (ej: 23).");
                     continue;
                 }
-                // Comprobar si está ocupado (valor 1)
+                //Comprobar si está ocupado (valor 1)
                 else if(asientosPorPeli[el3-1][ind][(asiento/10)-1][(asiento%10)-1] == 1){
                     System.out.println("El asiento ya está ocupado. Vuelve a elegirlo.");
                     continue;
                 }
                 else{
-                    // Guardar asiento:
-                    // 1. En array temporal 'asientosElegidos'
+                    //Guardar el asiento:
+                    //1. En array temporal 'asientosElegidos'
                     asientosElegidos[indexDePrimerCero(asientosElegidos)] = asiento;
                     int ind_compra = indexDePrimerCero(asientosComprados);
-                    // 2. En array persistente 'asientosComprados'
+                    //2. En array persistente 'asientosComprados'
                     asientosComprados[ind_compra] = asiento;
-                    // 3. Marcar como ocupado en la matriz visual
+                    //3. Marcar como ocupado en la matriz visual
                     asientosPorPeli[el3-1][ind][(asiento/10)-1][(asiento%10)-1] = 1;
                     numeroDeAsientos++;
                     horario[ind_compra] = ind; 
@@ -185,14 +185,14 @@ public class GestionDeEntradas {
 
             }
         }
-        // Recogida de datos personales
-        // Se piden nombre, apellido y correo con validación de "campo vacío"
-        // También incluyen lógica de cancelación (-1) que revierte la compra
+        //Recogida de datos personales.
+        //Se piden nombre, apellido y correo electrónico.
+        //También incluyen lógica de cancelación (-1) que revierte la compra.
         System.out.println("Introduce nombre");
         String nombre;
         do {
             nombre = sc.nextLine();
-            // Lógica de reversión
+            //Lógica de cancelación de operación.
             if (nombre.equals("-1")) {
                 int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
@@ -215,7 +215,7 @@ public class GestionDeEntradas {
         String apellido;
         do {
             apellido = sc.nextLine();
-            // Lógica de reversión
+            //Lógica de cancelación de operación.
             if (apellido.equals("-1")) {
                 int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
@@ -237,7 +237,7 @@ public class GestionDeEntradas {
         String correo;
         do {
             correo = sc.nextLine();
-            // Lógica de reversión
+            //Lógica de cancelación de operación.
             if (correo.equals("-1")) {
                 int idx = indexDePrimerCero(asientosComprados) - 1;
                 if (idx >= 0) {
@@ -253,46 +253,46 @@ public class GestionDeEntradas {
                 }
                 comprarEntradas(); 
             }
-            // Validación simple de correo
+            //Comprobación de correo válido.
             if (!correo.contains("@") || correo.length() < 5) {
                 System.out.println("Correo inválido. Intenta otra vez:");
                 correo = "";
             }
         } while (correo.isEmpty());
-        // Actualizar los arrays con los datos personales para todas las entradas de esta sesión
+        //Actualizar los arrays con los datos personales para todas las entradas de esta sesión.
         for(int i = 0; i < nombres.length; i++){
-            // Buscamos las entradas que acabamos de crear (que tienen null en nombre)
+            //Buscamos las entradas que acabamos de crear que tienen null en nombre.
             if(peliculas[i] == el3 && horario[i] == ind && nombres[i] == null){
                 nombres[i] = nombre;
                 apellidos[i] = apellido;
                 correos[i] = correo;
             }
         }
-        // Cálculo de precios y promociones
+        //Cálculo de precios y promociones.
         System.out.println("Introduce codigo de promocion:\nSi no lo tienes inserte 0");
         String promocion = sc.nextLine();
         
         double precioFinal = numeroDeAsientos * precioPorEntrada;
-        // Aplicar descuento si coincide el código
+        //Aplicar descuento si coincide el código.
         for(int i = 0; i < codigosDePromocion.length; i++){
             if(promocion.equals(codigosDePromocion[i])){
                 precioFinal -= precioFinal * promoDescuentos[i];
             }
         }
-        // Guardar el precio individual pagado en el array 'precios'
+        //Guardar el precio individual pagado en el array "precios".
         for(int i = 0; i < nombres.length; i++){
             if(peliculas[i] == el3 && horario[i] == ind && precios[i] == 0){
                 precios[i] = precioFinal / numeroDeAsientos;
             }
         }
+        //Imprimir los datos finales de la compra (número de asientos reservados y precio final).
         System.out.println("Numeros de asientos reservados " + numeroDeAsientos);
         System.out.println("Precio final pagado por entradas " + precioFinal);
-        // Guardar cambios en el fichero físico
+        //Guardar cambios en el fichero.
         guardarDatos();
     }
-    /**
-     * Imprime visualmente la matriz de asientos (sala de cine).
-     */
+    
+    //Imprime la matriz de asientos de la sala de cine, con un 0 para asientos libres y un 1 para asientos ocupados.
     public static void printSeats(int[][] hall) {
         int rows = hall.length;
         int cols = hall[0].length;
@@ -309,21 +309,19 @@ public class GestionDeEntradas {
             System.out.println();
         }
     }
-    /**
-     * Utilidad para encontrar el primer hueco vacío en un array.
-     * Esencial para añadir nuevos registros.
-     */
-    public static int indexDePrimerCero(int arr[]){
+    
+    //Función utlizada para encontrar el primer hueco vacío en un array.
+    //Necesaria para añadir nuevos registros.
+    public static int indexDePrimerCero(int[] arr){
         for(int i = 0; i < arr.length; i++){
             if(arr[i] == 0){
                 return i;
             }
         }
-        return -1; // Array lleno
+        return -1; //Si el array está lleno.
     }
-    /**
-     * Borra lógicamente una compra poniendo todos sus campos a null o 0.
-     */
+    
+    //Borra el registro de una compra poniendo todos sus campos a null o 0.
     public static void borrarCompra(int index) {
         nombres[index] = null;
         apellidos[index] = null;
@@ -333,11 +331,10 @@ public class GestionDeEntradas {
         horario[index] = 0;
         precios[index] = 0;
     }
-    /**
-     * Busca entradas compradas por nombre/apellido/email y permite eliminarlas.
-     */
+    
+    //Busca entradas compradas por nombre/apellido/email y permite eliminarlas del registro de compras.
     public static void devolucionEntradas() {
-        sc.nextLine(); // Limpieza buffer
+        sc.nextLine(); //Necesario para limpiar el cambio de línea, sin esto se saltaría el último sc.nextLine()
         System.out.println("\nInserte los datos de su compra: nombre, apellidos y email con el que se realizó la compra.");
 
         System.out.println("Inserte su nombre:");
@@ -348,13 +345,13 @@ public class GestionDeEntradas {
 
         System.out.println("Inserte su email:");
         String email = sc.nextLine().trim();
-        // Buscar coincidencias en los arrays
+        //Buscar coincidencias en los arrays.
         int[] indicesEncontrados = new int[nombres.length];
         int count = 0;
 
         for (int i = 0; i < nombres.length; i++) {
             if (nombres[i] == null || apellidos[i] == null || correos[i] == null) continue;
-            // Comparación ignorando mayúsculas/minúsculas
+            //Comparación ignorando mayúsculas/minúsculas.
             if (nombres[i].trim().equalsIgnoreCase(nombre)
                 && apellidos[i].trim().equalsIgnoreCase(apellido)
                 && correos[i].trim().equalsIgnoreCase(email)) {
@@ -362,7 +359,7 @@ public class GestionDeEntradas {
                 count++;
             }
         }
-        // Si no encuentra nada, da opción de reintentar
+        //Si no encuentra nada se da opción de reintentar.
         if (count == 0) {
             System.out.println("Datos no encontrados.");
             System.out.println("Pulsa 1 para intentar otra vez, 2 para volver al menu anterior.");
@@ -374,7 +371,7 @@ public class GestionDeEntradas {
             }
             return;
         }
-        // Copiar los índices encontrados a un array ajustado
+        //Copiar los índices encontrados a un array ajustado.
         int[] indices = new int[count];
         for (int i = 0; i < count; i++) {
             indices[i] = indicesEncontrados[i];
@@ -385,23 +382,20 @@ public class GestionDeEntradas {
     }
 
 
-    /**
-     * Calcula el dinero a devolver y elimina los registros.
-     */
+    //Calcula el dinero a devolver y elimina los registros.
     public static void confirmarDevolucion(int[] arr){
         double suma = 0;
         for(int i = 0; i < arr.length; i++){
             if(arr[i] != -1){
-                suma += precios[arr[i]]; // Sumar importe
-                borrarCompra(arr[i]); // Borrar de memoria
+                suma += precios[arr[i]]; //Sumar importe.
+                borrarCompra(arr[i]); //Borrar el registro de la compra.
             }
         }
         System.out.println("Devolucion efectuada con cantidad de dinero " + suma);
-        guardarDatos(); // Actualizar fichero
+        guardarDatos(); //Actualiza el fichero.
     }
-    /**
-     * Acceso protegido por contraseña ("234").
-     */
+    
+    //Acceso protegido por contraseña ("234").
     public static void cuentaAdmin(){
         System.out.println("Inserte la contraseña");
         String cont = sc.nextLine();
@@ -413,9 +407,8 @@ public class GestionDeEntradas {
           cuentaAdmin();
         }
     }
-    /**
-     * Menú de estadísticas (Entradas vendidas y Ingresos en dinero).
-     */
+    
+    //Menú de estadísticas de administrados con opciones de "Entradas vendidas" e "Ingresos en dinero".
     public static void adminStats(){
         System.out.println("\nBienvenido a las estadísticas de admin. Eliga una de las opciones: \n 1. Entradas vendidas. \n 2. Ingresos totales. \n 3. Volver");
         int stats = sc.nextInt();
@@ -433,10 +426,10 @@ public class GestionDeEntradas {
             System.out.println("Solo se acepta 1, 2 o 3");
         }
     }
-    // Estos métodos iteran sobre los arrays globales contando 'peliculas[i]' o sumando 'precios[i]'
-      
+    
+    //Las siguientes funciones (entradasVendidas, ventas, ingresosTotales, ingresosHoy) iteran sobre los arrays globales contando 'peliculas[i]' o sumando 'precios[i]'  
     public static void entradasVendidas(){
-        System.out.println("\nElige una de las opciones:\n1. Entradas vendidas a Pelicula 1\n2. Entradas vendidas a Pelicula 2\n3. Entradas vendidas a Pelicula 3\n4. Entradas vendidas a Pelicula 4\n5. Entradas vendidas a Pelicula 5\n6. Entradas vendidas totales\n7. Volver");
+        System.out.println("\nElige una de las opciones:\n1. Entradas vendidas a Wicked(For Good)\n2. Entradas vendidas a Barbie\n3. Entradas vendidas a Roblox: The movie\n4. Entradas vendidas a Yago comiendo\n5. Entradas vendidas a Five Nights at Freddy's 2\n6. Entradas vendidas totales\n7. Volver");
         int entradas = sc.nextInt();
         switch (entradas){
             case 1:
@@ -494,7 +487,7 @@ public class GestionDeEntradas {
     }
 
     public static void ingresosTotales(){
-        System.out.println("\nElige una de las opciones:\n1. Ingresos de Pelicula 1\n2. Ingresos a Pelicula 2\n3. Ingresos a Pelicula 3\n4. Ingresos a Pelicula 4\n5. Ingresos a Pelicula 5\n6. Ingresos totales\n7. Volver");
+        System.out.println("\nElige una de las opciones:\n1. Ingresos de Wicked(For Good)\n2. Ingresos a Barbie\n3. Ingresos a Roblox: The movie\n4. Ingresos a Yago comiendo\n5. Ingresos a Five Nights at Freddy's 2\n6. Ingresos totales\n7. Volver");
         int ingreso = sc.nextInt();
         switch (ingreso){
             case 1:
@@ -553,10 +546,8 @@ public class GestionDeEntradas {
           System.out.println("Solo se acepta 1 o 2");
         }
     }
-    /**
-     * Escribe un array 2D de Strings en un fichero de texto.
-     * Usa un separador (ej: ";")
-     */
+    
+    //Escribe un array 2D de Strings en un fichero de texto. Usa un separador (ej: ";").
     public static void escribirFichero(String[][] datos, String separadorColumnas, String nombreFichero){
         try {
             String ruta = System.getProperty("user.dir") + File.separator + nombreFichero;
@@ -565,7 +556,7 @@ public class GestionDeEntradas {
             for (int i = 0; i < datos.length; i++) {
                 String[] fila = datos[i];
                 for (int j = 0; j < fila.length; j++) {
-                    // Si es null escribe espacio, si no escribe el dato
+                    //Si es null escribe espacio, si no escribe el dato
                     if (fila[j] == null) {
                         writer.append(" ");
                     } else {
@@ -574,7 +565,7 @@ public class GestionDeEntradas {
                     if (j < fila.length - 1)
                         writer.append(separadorColumnas);
                 }
-                writer.append(System.lineSeparator()); // Salto de línea
+                writer.append(System.lineSeparator()); //Salto de línea
             }
             writer.flush();
             writer.close();
@@ -583,9 +574,8 @@ public class GestionDeEntradas {
             e.printStackTrace();
         }
     }
-    /**
-     * Lee un fichero de texto y lo convierte en una matriz de Strings.
-     */
+    
+    //Lee un fichero de texto y lo convierte en una matriz de Strings.
     public static String[][] leerFichero(String separadorColumnas, String nombreFichero){
         String ruta = System.getProperty("user.dir") + File.separator + nombreFichero;
 
@@ -602,30 +592,28 @@ public class GestionDeEntradas {
             scanner.close();
 
         } catch (FileNotFoundException e) {
-            return null; // Si no existe fichero, retorna null
+            return null; //Si no existe fichero, retorna null
         }
-        // Convertir lista a array 2D
+        //Convertir lista a array 2D
         String[][] res = new String[list.size()][];
         for (int i = 0; i < res.length; i++) {
             res[i] = list.get(i);
         }
         return res;
     }
-    /**
-     * Compacta los arrays (elimina huecos vacíos generados por devoluciones)
-     * y guarda el estado limpio en 'datos.txt'.
-     */
+        
+    //Compacta los arrays (elimina huecos vacíos generados por devoluciones) y guarda el estado en 'datos.txt'.
     public static void guardarDatos() {
         int posNull = -1;
-        // Algoritmo de compactación: Mueve datos válidos a las posiciones vacías (null)
+        //Algoritmo de compactación: Mueve datos válidos a las posiciones vacías (null)
         for (int i = 0; i < nombres.length; i++) {
 
             if (nombres[i] == null && posNull == -1) {
-                posNull = i; // Encontramos el primer hueco
+                posNull = i; //Encontramos el primer hueco vacío.
             }
 
             if (posNull != -1 && nombres[i] != null) {
-                // Movemos el dato actual 'i' al hueco 'posNull'
+                //Movemos el dato actual 'i' al hueco 'posNull'.
                 nombres[posNull] = nombres[i];
                 apellidos[posNull] = apellidos[i];
                 correos[posNull] = correos[i];
@@ -634,7 +622,7 @@ public class GestionDeEntradas {
                 horario[posNull] = horario[i];
                 precios[posNull] = precios[i];
 
-                // Borramos la posición antigua
+                //Borramos la posición antigua
                 nombres[i] = null;
                 apellidos[i] = null;
                 correos[i] = null;
@@ -642,12 +630,11 @@ public class GestionDeEntradas {
                 asientosComprados[i] = 0;
                 horario[i] = 0;
                 precios[i] = 0;
-
                 
-                posNull++; // El hueco avanza
+                posNull++; //El hueco avanza
             }
         }
-        // Preparar matriz de Strings para escribir en fichero
+        //Preparar matriz de Strings para escribir en fichero
         String[][] tabla = new String[nombres.length][7];
         for (int i = 0; i < nombres.length; i++) {
             tabla[i][0] = nombres[i];
@@ -661,17 +648,16 @@ public class GestionDeEntradas {
 
         escribirFichero(tabla, ";", "datos.txt");
     }
-    /**
-     * Carga los datos del fichero al iniciar el programa y rellena los arrays en memoria.
-     */
+        
+    //Carga los datos del fichero al iniciar el programa y rellena los arrays en memoria.
     public static void cargarDatos() {
         String[][] tabla = leerFichero(";", "datos.txt");
         if (tabla == null) return;
 
         for (int i = 0; i < tabla.length; i++) {
-            // Evitar líneas corruptas
+            //Evitar líneas corruptas.
             if (tabla[i].length < 7) continue;
-            // Convertir " " a null y Strings numéricos a int/double
+            //Convertir " " a null y Strings numéricos a int/double.
             if (tabla[i][0].equals(" ")) {
                 nombres[i] = null;
             } 
@@ -691,8 +677,8 @@ public class GestionDeEntradas {
                 correos[i] = tabla[i][2];           
             }
             
-            // Parsing de números
-            peliculas[i] = Integer.parseInt(tabla[i][3]); // parseInt transforma String a int
+            //Parsing de números
+            peliculas[i] = Integer.parseInt(tabla[i][3]); //parseInt transforma String a int
             asientosComprados[i] = Integer.parseInt(tabla[i][4]);
             horario[i] = Integer.parseInt(tabla[i][5]);
             precios[i] = Double.parseDouble(tabla[i][6]);
@@ -701,24 +687,25 @@ public class GestionDeEntradas {
 
 
     public static void main(String[] args){
-        // 1. Cargar persistencia (datos anteriores)
+        //1. Cargar persistencia (datos anteriores)
         cargarDatos();
-        // 2. Reconstruir el estado visual de los asientos (matriz 4D) basado en los datos cargados
+        //2. Reconstruir el estado visual de los asientos (matriz 4D) basado en los datos cargados
         for (int i = 0; i < asientosComprados.length; i++) {
             if (asientosComprados[i] != 0) { 
                 int pelicula = peliculas[i] - 1;   
                 int hor = horario[i];              
                 int asiento = asientosComprados[i];
-                // Decodificar formato asiento (ej: 23 -> Fila 1 (índice), Asiento 2 (índice))
+                //Decodificar formato asiento (ej: 23 -> Fila 1 (índice), Asiento 2 (índice))
                 int fila = (asiento / 10) - 1;
                 int col = (asiento % 10) - 1;
-                // Marcar como ocupado
+                //Marcar como ocupado
                 asientosPorPeli[pelicula][hor][fila][col] = 1; 
             }
         }
-        // 3. Iniciar la interfaz de usuario
+        //3. Iniciar la interfaz de usuario
         menuPrincipal();
 
     }
 }
+
 
